@@ -1,0 +1,26 @@
+.navbar {
+    background-color: #FFD700;
+}
+
+.navbar-dark .navbar-brand {
+    color: #000;
+    font-family: 'Roboto', sans-serif;
+}
+
+.navbar-dark .navbar-brand:hover {
+    color: #384D8F;
+}
+
+.my-nav-link {
+    color: #000;
+    font-family: 'Roboto', sans-serif;
+}
+
+.my-nav-link:hover {
+    color: #384D8F;
+}
+
+.profile-icon {
+    width: 20px;
+    margin-left: 5px;
+}

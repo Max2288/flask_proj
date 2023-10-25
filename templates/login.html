@@ -1,0 +1,22 @@
+<body>
+    {% include 'header.html' %}
+    <link rel="stylesheet" href="static/styles/login.css">
+    <div class="container">
+        <div class="login-container">
+            <h2 class="login-heading">Вход</h2>
+            <form method="POST" class="login-form">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+                    {{ form.username(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+                    {{ form.password(class="form-control") }}
+                </div>
+                <button type="submit" class="btn btn-primary login-button" style="background-color: #384D8F; color: #EEE82F;">Войти</button>
+            </form>
+            <p class="registration-note">Если вы еще не зарегистрированы, <a href="/register" class="my-nav-link">зарегистрируйтесь</a>.</p>
+        </div>
+    </div>
+</body>
