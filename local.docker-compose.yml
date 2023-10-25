@@ -1,0 +1,51 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5432:5432 
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${PG_USER}"]
+      interval: 1s
+      timeout: 1s
+      retries: 30
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  migrations:
+    build: .
+    container_name: postgres-migrations
+    environment:
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  flask:
+    build: .
+    env_file: .env
+    ports:
+      - "5000:5000"
+    environment:
+      - SENDER=${SENDER}
+      - PASSWORD_SENDER=${PASSWORD_SENDER}
+      - DOMAIN=${DOMAIN}
+      - PORT=${PORT}
+      - TEMPLATE_FOLDER=${TEMPLATE_FOLDER}
+      - SECRET_KEY=${SECRET_KEY}
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - SCHEMA_NAME=${SCHEMA_NAME}
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
