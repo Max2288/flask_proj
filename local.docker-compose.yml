@@ -18,14 +18,18 @@ services:
   migrations:
     build: .
     container_name: postgres-migrations
-    environment:
-      - PG_USER=${PG_USER}
-      - PG_PASSWORD=${PG_PASSWORD}
-      - DB_NAME=${DB_NAME}
     depends_on:
       postgres:
         condition: service_healthy
     command: ["alembic", "upgrade", "head"]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  fill_db:
+    build: .
+    command: ["python3", "init_db.py"]
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
     extra_hosts:
       - "host.docker.internal:host-gateway"
   flask:
@@ -41,11 +45,12 @@ services:
       - TEMPLATE_FOLDER=${TEMPLATE_FOLDER}
       - SECRET_KEY=${SECRET_KEY}
       - PG_USER=${PG_USER}
+      - PG_HOST=${PG_HOST}
       - PG_PASSWORD=${PG_PASSWORD}
       - DB_NAME=${DB_NAME}
       - SCHEMA_NAME=${SCHEMA_NAME}
     depends_on:
-      migrations:
+      fill_db:
         condition: service_completed_successfully
     extra_hosts:
       - "host.docker.internal:host-gateway"
