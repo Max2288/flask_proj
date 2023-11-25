@@ -1,22 +1,42 @@
 .navbar {
     background-color: #FFD700;
+    border-bottom: 3px solid #FFA500;
+    padding: 10px 0;
 }
 
-.navbar-dark .navbar-brand {
-    color: #000;
+.navbar-brand {
+    display: flex;
+    align-items: center;
     font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #000;
+}
+.my-nav-link{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    color: #000;
+}
+
+.navbar-brand img {
+    height: 50px;
+    margin-right: 10px;
+}
+
+.navbar-dark .navbar-brand{
+    color: #000;
 }
 
 .navbar-dark .navbar-brand:hover {
     color: #384D8F;
 }
 
-.my-nav-link {
+.nav-item .my-nav-link {
     color: #000;
     font-family: 'Roboto', sans-serif;
+    text-decoration: none;
 }
 
-.my-nav-link:hover {
+.nav-item .my-nav-link:hover {
     color: #384D8F;
 }
 
