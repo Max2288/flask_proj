@@ -1,6 +1,7 @@
 import smtplib
 
-from flask import Flask, flash, redirect, render_template, request, url_for
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
+                   session, url_for)
 from flask_bootstrap import Bootstrap
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
@@ -8,10 +9,11 @@ from loguru import logger
 from sqlalchemy.orm import Session
 from werkzeug.security import check_password_hash
 
-from common.utils import send_email_message, smtp_generator
+from common.utils import (generate_token, send_email_message, smtp_generator,
+                          token_required)
 from config import Config, UserConfig
 from db.crud import create_user
-from db.models import User
+from db.models import Cheese, User
 from db.session import get_db
 from forms import *
 
@@ -22,6 +24,7 @@ bootstrap = Bootstrap(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -37,6 +40,7 @@ def load_user(user_id):
     db = next(get_db())
     return db.query(User).get(user_id)
 
+
 @app.route('/')
 def index():
     """
@@ -45,7 +49,10 @@ def index():
     Returns:
         str: HTML-шаблон для главной страницы.
     """
-    return render_template('index.html')
+    db = next(get_db())
+    cheese = db.query(Cheese).all()
+    return render_template('index.html', cheese=cheese)
+
 
 @login_required
 @app.route('/profile', methods=['GET', 'POST'])
@@ -76,6 +83,7 @@ def profile():
             flash('Сообщение успешно отправлено!', 'success')
     return render_template('profile.html', user=current_user, form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login(db: Session = next(get_db())):
     """
@@ -89,10 +97,13 @@ def login(db: Session = next(get_db())):
         user = db.query(User).filter_by(username=form.username.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
+            token = generate_token(user.id)
+            session['token'] = token
             flash('Вы успешно вошли!', 'success')
             return redirect(url_for('index'))
         flash('Вы не смогли войти! Проверьте ваши данные.', 'danger')
     return render_template('login.html', form=form)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register(db: Session = next(get_db())):
@@ -110,6 +121,7 @@ def register(db: Session = next(get_db())):
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -120,8 +132,32 @@ def logout():
         str: HTML-шаблон для страницы выхода.
     """
     logout_user()
+    session.pop('token', None)
     flash('Вы успешно вышли!', 'success')
     return redirect(url_for('index'))
+
+
+@app.route('/cheese/api')
+@token_required
+def cheese_api():
+    """
+    Обработчик маршрута '/cheese/api' для получения данных о сырах в формате JSON.
+
+    Returns:
+        JSON: Данные о сырах в формате JSON.
+    """
+    db = next(get_db())
+    cheeses = db.query(Cheese).all()
+    cheese_data = [
+        {
+            "name": cheese.name,
+            "description": cheese.description,
+            "image_path": cheese.image_path
+        }
+        for cheese in cheeses
+    ]
+    return jsonify(cheese_data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
