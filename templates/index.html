@@ -1,8 +1,41 @@
-
 <body>
-    {% include 'header.html' %}
-    <div class="container mt-4">
-        <h1>Welcome to the Cheese Shop</h1>
+    <div class="body-container">
+        {% include 'header.html' %}
+        <link rel="stylesheet" href="static/styles/index.css">
+        <div class="container mt-4">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search for cheeses..." onkeyup="searchCheese()">
+            </div>
+            <div class="cheese-container">
+                {% for cheese in cheese %}
+                <div class="cheese-item">
+                    <img src="{{ cheese.image_path }}" alt="{{ cheese.name }}">
+                    <h2>{{ cheese.name }}</h2>
+                    <p>{{ cheese.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% include 'footer.html' %}
     </div>
 </body>
-</html>
+
+<script>
+    function searchCheese() {
+        var input, filter, container, cheese, title, i, txtValue;
+        input = document.getElementById('searchInput');
+        filter = input.value.toUpperCase();
+        container = document.querySelector('.cheese-container');
+        cheese = container.getElementsByClassName('cheese-item');
+
+        for (i = 0; i < cheese.length; i++) {
+            title = cheese[i].getElementsByTagName("h2")[0];
+            txtValue = title.textContent || title.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                cheese[i].style.display = "";
+            } else {
+                cheese[i].style.display = "none";
+            }
+        }
+    }
+</script>

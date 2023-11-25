@@ -3,23 +3,29 @@
     <link rel="stylesheet" href="static/styles/profile.css">
     <div class="container">
         <div class="profile-container">
-            <h2 class="profile-heading">Профиль пользователя</h2>
-            <p>Добро пожаловать, {{ user.username }}!</p>
-            <h2>Форма обратной связи</h2>
-            <form method="POST" class="profile-form">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email">
-                </div>
-                <div class="form-group">
-                    <label for="message">Сообщение</label>
-                    <textarea class="form-control" id="message" name="message" rows="5"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary profile-button" style="background-color: #384D8F; color: #EEE82F;">Отправить сообщение</button>
-            </form>
-            <a href="/logout" class="btn btn-danger mt-3">Выйти</a>
+            <div class="user-info-container">
+                <h2 class="user-info-heading">Информация о пользователе</h2>
+                <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                <p><strong>Статус администратора:</strong> {{ 'Да' if user.is_admin else 'Нет' }}</p>
+            </div>
+            <div class="profile-form-container">
+                <h2 class="feedback-form-heading">Форма обратной связи</h2>
+                <form method="POST" class="profile-form">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Сообщение</label>
+                        <textarea class="form-control" id="message" name="message" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn profile-button">Отправить сообщение</button>
+                </form>
+            </div>
+            <div class="logout-button-container">
+                <a href="/logout" class="btn btn-danger profile-logout-button">Выйти</a>
+            </div>
         </div>
     </div>
 </body>
-</html>
