@@ -28,6 +28,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('pk_cheese')),
     schema='public'
     )
+    op.create_unique_constraint('uq_cheese_name_description', 'cheese', ['name', 'description'])
     op.create_table('user',
     sa.Column('username', sa.String(length=80), nullable=False),
     sa.Column('password', sa.String(length=255), nullable=False),
