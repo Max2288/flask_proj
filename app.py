@@ -116,7 +116,11 @@ def register(db: Session = next(get_db())):
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, password=form.password.data)
-        create_user(db, user)
+        try:
+            create_user(db, user)
+        except Exception as err:
+            flash(f'Произошла ошибка во время регистрации! {err}', 'danger')
+            return redirect(url_for('register'))
         flash('Регистрация успешна! Теперь вы можете войти.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)

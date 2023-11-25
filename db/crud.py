@@ -29,6 +29,14 @@ def create_user(db_session: Session, user: User):
         то сессия db_session будет откатываться до начального состояния перед вызовом этой функции. 
         Это предотвращает несогласованное состояние базы данных после ошибки.
     """
+    existing_user = db_session.query(User).filter(
+        User.username == user.username
+    ).first()
+    if existing_user:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            "Пользователь с таким именем уже существует."
+        )
     try:
         db_session.add(
             User(
@@ -40,8 +48,8 @@ def create_user(db_session: Session, user: User):
     except sqlalchemy.exc.IntegrityError as exc:
         db_session.rollback()
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail=str(exc.orig)
+            HTTPStatus.CONFLICT,
+            str(exc.orig)
         )
     return {"message": 'Пользователь создан'}
 
@@ -81,6 +89,6 @@ def create_cheese(db_session: Session, name: str, description: str, image_path: 
     except IntegrityError as exc:
         db_session.rollback()
         raise HTTPException(
-            status_code=HTTPStatus.CONFLICT,
-            detail=str(exc.orig)
+            HTTPStatus.CONFLICT,
+            str(exc.orig)
         )
